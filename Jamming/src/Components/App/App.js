@@ -5,6 +5,9 @@ import './App.css';
 import SearchBar from '../SearchBar/SearchBar';
 import SearchResults from '../SearchResults/SearchResults';
 import Playlist from '../Playlist/Playlist';
+
+import Spotify from '../../util/Spotify';
+
 //import TrackList from '../TrackList/TrackList';
 
 class App extends React.Component {
@@ -18,48 +21,11 @@ class App extends React.Component {
     this.search = this.search.bind(this);
 
     this.state = {
-      searchResults: [
-        {
-          name: 'name1',
-          artist: 'artist1',
-          album: 'album1',
-          id: 'id1'
-        },
-        {
-          name: 'name2',
-          artist: 'artist2',
-          album: 'album2',
-          id: 'id2'
-        },
-        {
-          name: 'name3',
-          artist: 'artist3',
-          album: 'album3',
-          id: 'id3'
-        }
-      ],
+      searchResults: [],
 
       playlistName: 'MyAwesomePlaylist',
 
-      playlistTracks: [{
-        name: 'playlistName1',
-        artist: 'artistName1',
-        album: 'albumName1',
-        id: '4'
-      },
-      {
-        name: 'playlistName2',
-        artist: 'artistName2',
-        album: 'albumName2',
-        id: '5'
-      },
-      {
-        name: 'playlistNam3',
-        artist: 'artistNam3',
-        album: 'albumNam3',
-        id: '6'
-      },
-      ]
+      playlistTracks: []
     }
   }
 
@@ -86,14 +52,26 @@ class App extends React.Component {
     this.setState({ playlistName: newName })
   }
 
-  savePlaylist() {
-    const trackURIs = this.state.playlistTracks.map(track => track.uri);
+  savePlaylist(playlistName, tracksURIs) {
+    playlistName = this.state.playlistName;
+    tracksURIs = this.state.playlistTracks.map(track => track.uri);
+    Spotify.savePlaylist(this.state.playlistName, tracksURIs).then(() => {
+      this.setState({
+        playlistName: 'New Playlist',
+        playlistTracks: []
+      })
+    } )
     }
    
   
 
   search(term){
-    console.log(term);
+     Spotify.search(term).then(searchResults => { // returns a promise that then is named searchResults to be used to setState
+      
+     this.setState({searchResults: searchResults})
+    })
+  
+ 
   }
 
   render() {
